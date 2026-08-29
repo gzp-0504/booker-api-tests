@@ -19,6 +19,21 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Run Pytest
+    - name: Run Pytest with Allure
+      # 即使测试失败(always())也要生成结果
+      if: always()
       run: |
-        pytest -v
+        pytest -v --alluredir=allure-results
+    - name: Generate Allure HTML Report
+      if: always()
+      run: |
+        pip install allure-pytest
+        # 把结果文件生成静态HTML到 allure-report 目录
+        allure generate allure-results -o allure-report --clean
+    - name: Upload Allure Report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-report
+        path: allure-report
+        retention-days: 14
