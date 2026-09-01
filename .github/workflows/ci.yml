@@ -20,23 +20,22 @@ jobs:
         python -m pip install --upgrade pip
         pip install allure-pytest
         pip install -r requirements.txt
+        - name: Run Pytest with Allure
+              if: always()
+              run: |
+                pytest -v --alluredir=allure-results
 
-    - name: Run Pytest with Allure
-      if: always()
-      run: |
-        pytest -v --alluredir=allure-results
-        name: Generate Allure HTML Report
+            - name: Generate Allure HTML Report
               if: always()
               run: |
                 mkdir -p allure-report
-                allure generate allure-results -o allure-report --clean 2>/dev/null || \
-                python -m allure generate allure-results -o allure-report --clean 2>/dev/null || \
-                echo "Allure generate fallback"
+                python -m allure generate allure-results -o allure-report --clean || true
                 ls -la allure-report
-    - name: Upload Allure Report
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: allure-report
-        path: allure-report
-        retention-days: 14
+
+            - name: Upload Allure Report
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                name: allure-report
+                path: allure-report
+                retention-days: 14
