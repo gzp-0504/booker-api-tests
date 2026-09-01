@@ -1,41 +1,24 @@
-name: API Tests CI
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
+name: CI
+on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install allure-pytest
-        pip install -r requirements.txt
-        - name: Run Pytest with Allure
-              if: always()
-              run: |
-                pytest -v --alluredir=allure-results
-
-            - name: Generate Allure HTML Report
-              if: always()
-              run: |
-                mkdir -p allure-report
-                python -m allure generate allure-results -o allure-report --clean || true
-                ls -la allure-report
-
-            - name: Upload Allure Report
-              if: always()
-              uses: actions/upload-artifact@v4
-              with:
-                name: allure-report
-                path: allure-report
-                retention-days: 14
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run Pytest with Allure
+        run: pytest -v --alluredir=allure-results
+      - name: Upload Allure Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: allure-results
+          retention-days: 14
